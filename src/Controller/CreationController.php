@@ -68,7 +68,6 @@ class CreationController
         UrlGeneratorInterface $urlGenerator,
         ValidatorInterface $validator
     ): JsonResponse {
-        $creation->setAuthor($entityManager->getRepository(User::class)->findOneBy([]));
 
         $errors = $validator->validate($creation);
 

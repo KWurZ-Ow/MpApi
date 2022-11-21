@@ -34,12 +34,6 @@ class Creation
     private ?string $content = null;
 
     /**
-     * @var User
-     * @ORM\ManyToOne(targetEntity="User")
-     */
-    private User $author;
-
-    /**
      * @var User[]|Collection
      * @ORM\ManyToMany(targetEntity="User")
      * @ORM\JoinTable(name="creation_likes")
@@ -48,14 +42,12 @@ class Creation
 
     /**
      * @param string $content
-     * @param User $author
      * @return static
      */
-    public static function create(string $content, User $author): self
+    public static function create(string $content): self
     {
         $creation = new self();
         $creation->content = $content;
-        $creation->author = $author;
 
         return $creation;
     }
@@ -90,22 +82,6 @@ class Creation
     public function setContent(string $content): void
     {
         $this->content = $content;
-    }
-
-    /**
-     * @return User
-     */
-    public function getAuthor(): User
-    {
-        return $this->author;
-    }
-
-    /**
-     * @param User $author
-     */
-    public function setAuthor(User $author): void
-    {
-        $this->author = $author;
     }
 
     /**
