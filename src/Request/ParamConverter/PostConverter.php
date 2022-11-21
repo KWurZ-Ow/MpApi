@@ -2,17 +2,17 @@
 
 namespace App\Request\ParamConverter;
 
-use App\Entity\Creation;
+use App\Entity\Post;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
 use Sensio\Bundle\FrameworkExtraBundle\Request\ParamConverter\ParamConverterInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Serializer\SerializerInterface;
 
 /**
- * Class CreationConverter
+ * Class PostConverter
  * @package App\Request\ParamConverter
  */
-class CreationConverter implements ParamConverterInterface
+class PostConverter implements ParamConverterInterface
 {
     /**
      * @var SerializerInterface
@@ -20,7 +20,7 @@ class CreationConverter implements ParamConverterInterface
     private SerializerInterface $serializer;
 
     /**
-     * CreationConverter constructor.
+     * PostConverter constructor.
      * @param SerializerInterface $serializer
      */
     public function __construct(SerializerInterface $serializer)
@@ -50,6 +50,6 @@ class CreationConverter implements ParamConverterInterface
      */
     public function supports(ParamConverter $configuration)
     {
-        return $configuration->getClass() === Creation::class;
+        return $configuration->getClass() === Post::class;
     }
 }
