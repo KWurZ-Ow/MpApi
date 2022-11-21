@@ -2,81 +2,133 @@
 
 namespace App\Entity;
 
-use App\Repository\UserRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
-#[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: '`user`')]
-class User
+/**
+ * Class User
+ * @package App\Entity
+ * @ORM\Entity
+ */
+class User implements UserInterface
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    /**
+     * @var int|null
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue
+     */
+    private ?int $id;
 
-    #[ORM\Column(length: 255)]
-    private ?string $usename = null;
+    /**
+     * @var string
+     * @ORM\Column(unique=true)
+     */
+    private string $email;
 
-    #[ORM\Column(length: 255)]
-    private ?string $passwd = null;
+    /**
+     * @var string
+     * @ORM\Column
+     */
+    private string $password;
 
-    #[ORM\Column(type: Types::ARRAY)]
-    private array $roles = [];
+    /**
+     * @var string
+     * @ORM\Column
+     */
+    private string $name;
 
-    #[ORM\Column(type: Types::ARRAY)]
-    private array $likes = [];
+    /**
+     * @param string $email
+     * @param string $name
+     * @return static
+     */
+    public static function create(string $email, string $name): self
+    {
+        $user = new self();
+        $user->email = $email;
+        $user->name = $name;
 
-    public function getId(): ?int
+        return $user;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
     {
         return $this->id;
     }
 
-    public function getUsename(): ?string
+    /**
+     * @return string
+     */
+    public function getEmail(): string
     {
-        return $this->usename;
+        return $this->email;
     }
 
-    public function setUsename(string $usename): self
+    /**
+     * @param string $email
+     */
+    public function setEmail(string $email): void
     {
-        $this->usename = $usename;
-
-        return $this;
+        $this->email = $email;
     }
 
-    public function getPasswd(): ?string
+    /**
+     * @return string
+     */
+    public function getPassword(): string
     {
-        return $this->passwd;
+        return $this->password;
     }
 
-    public function setPasswd(string $passwd): self
+    /**
+     * @param string $password
+     */
+    public function setPassword(string $password): void
     {
-        $this->passwd = $passwd;
-
-        return $this;
+        $this->password = $password;
     }
 
-    public function getRoles(): array
+    /**
+     * @return string
+     */
+    public function getName(): string
     {
-        return $this->roles;
+        return $this->name;
     }
 
-    public function setRoles(array $roles): self
+    /**
+     * @param string $name
+     */
+    public function setName(string $name): void
     {
-        $this->roles = $roles;
-
-        return $this;
+        $this->name = $name;
     }
 
-    public function getLikes(): array
+    /**
+     * @return string[]
+     */
+    public function getRoles()
     {
-        return $this->likes;
+        return ['ROLE_USER'];
     }
 
-    public function setLikes(array $likes): self
+    public function getSalt()
     {
-        $this->likes = $likes;
+    }
 
-        return $this;
+    /**
+     * @return string
+     */
+    public function getUsername()
+    {
+        return $this->email;
+    }
+
+    public function eraseCredentials()
+    {
     }
 }

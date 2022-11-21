@@ -2,140 +2,141 @@
 
 namespace App\Entity;
 
-use App\Repository\CreationRepository;
-use Doctrine\DBAL\Types\Types;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
-#[ORM\Entity(repositoryClass: CreationRepository::class)]
+/**
+ * Class Creation
+ * @package App\Entity
+ * @ORM\Entity
+ */
 class Creation
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
+    /**
+     * @var int|null
+     * @ORM\Id
+     * @ORM\Column(type="integer")
+     * @ORM\GeneratedValue
+     * @Groups({"get"})
+     */
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $title = null;
+    /**
+     * @var string
+     * @ORM\Column(type="text")
+     * @Groups({"get"})
+     * @Assert\NotBlank
+     * @Assert\Length(min=10)
+     */
+    private ?string $content = null;
 
-    #[ORM\Column(length: 255)]
-    private ?string $image = null;
+    /**
+     * @var User
+     * @ORM\ManyToOne(targetEntity="User")
+     */
+    private User $author;
 
-    #[ORM\Column(length: 255)]
-    private ?string $alt = null;
+    /**
+     * @var User[]|Collection
+     * @ORM\ManyToMany(targetEntity="User")
+     * @ORM\JoinTable(name="creation_likes")
+     */
+    private Collection $likedBy;
 
-    #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    private array $tags = [];
+    /**
+     * @param string $content
+     * @param User $author
+     * @return static
+     */
+    public static function create(string $content, User $author): self
+    {
+        $creation = new self();
+        $creation->content = $content;
+        $creation->author = $author;
 
-    #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    private array $softs = [];
+        return $creation;
+    }
 
-    #[ORM\Column(length: 3000)]
-    private ?string $body = null;
+    /**
+     * Creation constructor.
+     */
+    public function __construct()
+    {
+        $this->likedBy = new ArrayCollection();
+    }
 
-    #[ORM\Column(length: 500, nullable: true)]
-    private ?string $video = null;
-
-    #[ORM\Column(type: Types::ARRAY, nullable: true)]
-    private array $links = [];
-
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    public function getTitle(): ?string
+    /**
+     * @return string
+     */
+    public function getContent(): string
     {
-        return $this->title;
+        return $this->content;
     }
 
-    public function setTitle(string $title): self
+    /**
+     * @param string $content
+     */
+    public function setContent(string $content): void
     {
-        $this->title = $title;
-
-        return $this;
+        $this->content = $content;
     }
 
-    public function getImage(): ?string
+    /**
+     * @return User
+     */
+    public function getAuthor(): User
     {
-        return $this->image;
+        return $this->author;
     }
 
-    public function setImage(string $image): self
+    /**
+     * @param User $author
+     */
+    public function setAuthor(User $author): void
     {
-        $this->image = $image;
-
-        return $this;
+        $this->author = $author;
     }
 
-    public function getAlt(): ?string
+    /**
+     * @return User[]|Collection
+     */
+    public function getLikedBy(): Collection
     {
-        return $this->alt;
+        return $this->likedBy;
     }
 
-    public function setAlt(string $alt): self
+    /**
+     * @param User $user
+     */
+    public function likeBy(User $user): void
     {
-        $this->alt = $alt;
+        if ($this->likedBy->contains($user)) {
+            return;
+        }
 
-        return $this;
+        $this->likedBy->add($user);
     }
 
-    public function getTags(): array
+    /**
+     * @param User $user
+     */
+    public function dislikeBy(User $user): void
     {
-        return $this->tags;
-    }
+        if (!$this->likedBy->contains($user)) {
+            return;
+        }
 
-    public function setTags(?array $tags): self
-    {
-        $this->tags = $tags;
-
-        return $this;
-    }
-
-    public function getSofts(): array
-    {
-        return $this->softs;
-    }
-
-    public function setSofts(?array $softs): self
-    {
-        $this->softs = $softs;
-
-        return $this;
-    }
-
-    public function getBody(): ?string
-    {
-        return $this->body;
-    }
-
-    public function setBody(string $body): self
-    {
-        $this->body = $body;
-
-        return $this;
-    }
-
-    public function getVideo(): ?string
-    {
-        return $this->video;
-    }
-
-    public function setVideo(?string $video): self
-    {
-        $this->video = $video;
-
-        return $this;
-    }
-
-    public function getLinks(): array
-    {
-        return $this->links;
-    }
-
-    public function setLinks(?array $links): self
-    {
-        $this->links = $links;
-
-        return $this;
+        $this->likedBy->removeElement($user);
     }
 }
